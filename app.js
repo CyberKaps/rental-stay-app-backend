@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const PORT = 8080
 const Listing = require("./models/listing.js")
 const path = require("path")
+const methodOverride = require("method-override");
 // import 'dotenv/config'
 require('dotenv').config()
 
@@ -21,6 +22,7 @@ async function main() {
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({extended: true}));
+app.use(methodOverride('_method'));
 
 
 app.get("/", (req, res) => {
@@ -51,6 +53,14 @@ app.post("/listings",async (req,res) => {
     // let {title, description, image, price, location, country} = req.body;
     let newListing = new Listing(req.body.listing);
     await newListing.save();
+    res.redirect("/listings");
+})
+
+//Delete route
+app.delete("/listings/:id", async (req,res) => {
+    let {id} = req.params;
+    let deleteedListing = await Listing.findByIdAndDelete(id);
+    console.log(deleteedListing);
     res.redirect("/listings");
 })
 
